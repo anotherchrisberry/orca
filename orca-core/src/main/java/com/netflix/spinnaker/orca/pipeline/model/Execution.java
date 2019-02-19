@@ -30,6 +30,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.io.Serializable;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static com.netflix.spinnaker.orca.ExecutionStatus.NOT_STARTED;
 import static com.netflix.spinnaker.orca.pipeline.model.Execution.ExecutionType.ORCHESTRATION;
@@ -101,6 +102,13 @@ public class Execution implements Serializable {
 
   public void setBuildTime(@Nullable Long buildTime) {
     this.buildTime = buildTime;
+  }
+
+  public int getHash() {
+    String statusAndStuff = stages.stream()
+      .map(s -> s.getContext().toString().concat(s.getOutputs().toString()).concat(s.getStatus().name()))
+      .collect(Collectors.joining());
+    return statusAndStuff.hashCode();
   }
 
   private boolean canceled;
